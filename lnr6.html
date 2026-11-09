@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ŁĘŦÆVŞK ŘËPŮBĿÏÇ 6</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* =====================================================
+   1. THEME — change colors here
+   ===================================================== */
+:root{
+  --bg-1:#12041f; --bg-2:#2a0a3d; --bg-3:#4a0e4e;
+  --pink:#ff3dac; --violet:#8f4bff; --orange:#ff8a5c;
+  --card:rgba(255,255,255,.06); --border:rgba(255,255,255,.14);
+  --text:#f6eaff; --muted:#c3a8dc;
+  --ease:cubic-bezier(.22,.8,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Poppins',system-ui,sans-serif; color:var(--text); min-height:100vh;
+  background:linear-gradient(180deg,var(--bg-1) 0%,var(--bg-2) 55%,var(--bg-3) 100%) fixed;
+  overflow-x:hidden;
+}
+/* Soft glowing "sunset" blobs in the background */
+body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;filter:blur(90px);opacity:.45;pointer-events:none}
+body::before{width:55vmax;height:55vmax;left:-15vmax;top:-10vmax;background:var(--violet)}
+body::after{width:50vmax;height:50vmax;right:-15vmax;bottom:-12vmax;background:var(--pink)}
+
+/* Headings: white with stroke + neon glow */
+h1,h2,h3{color:#fff;font-weight:800;letter-spacing:.02em}
+.glow{
+  -webkit-text-stroke:1px rgba(255,61,172,.55);
+  text-shadow:0 0 12px rgba(255,61,172,.65),0 0 32px rgba(143,75,255,.55),0 0 64px rgba(255,61,172,.35);
+}
+.wrap{width:min(1100px,92%);margin:0 auto}
+section.page{display:none;padding:130px 0 80px;animation:fade .6s var(--ease)}
+section.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+.page-title{font-size:clamp(2rem,6vw,3.4rem);text-align:center;margin-bottom:12px}
+.page-sub{text-align:center;color:var(--muted);margin-bottom:44px}
+
+/* Reusable glass card */
+.card{
+  background:var(--card);border:1px solid var(--border);border-radius:22px;
+  backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);padding:26px;
+  transition:transform .4s var(--ease),box-shadow .4s var(--ease),border-color .4s var(--ease);
+}
+.card:hover{transform:translateY(-6px);border-color:rgba(255,61,172,.6);box-shadow:0 14px 40px rgba(255,61,172,.22)}
+
+/* Buttons */
+.btn{
+  display:inline-flex;align-items:center;gap:8px;cursor:pointer;border:0;text-decoration:none;
+  font:600 .95rem 'Poppins',sans-serif;color:#fff;padding:12px 24px;border-radius:999px;
+  background:linear-gradient(90deg,var(--pink),var(--violet));
+  box-shadow:0 0 18px rgba(255,61,172,.45);
+  transition:transform .3s var(--ease),box-shadow .3s var(--ease),filter .3s;
+}
+.btn:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 0 32px rgba(255,61,172,.8);filter:brightness(1.1)}
+.btn:active{transform:scale(.97)}
+.btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;transform:none;filter:none}
+
+/* =====================================================
+   2. NAVIGATION
+   ===================================================== */
+nav{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(18,4,31,.6);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+nav .wrap{width:100%;padding:0 clamp(14px,2.5vw,32px);display:flex;align-items:center;justify-content:space-between;height:70px}
+.logo{font-weight:800;font-size:1.05rem;color:#fff;text-decoration:none;text-shadow:0 0 14px var(--pink)}
+.links{display:flex;gap:6px;list-style:none}
+.links a{
+  color:var(--muted);text-decoration:none;font-weight:500;font-size:.92rem;padding:9px 16px;border-radius:999px;
+  transition:all .3s var(--ease);
+}
+.links a:hover{color:#fff;background:rgba(255,255,255,.08)}
+.links a.active{color:#fff;background:linear-gradient(90deg,rgba(255,61,172,.5),rgba(143,75,255,.5));box-shadow:0 0 16px rgba(255,61,172,.4)}
+.burger{display:none;background:none;border:0;color:#fff;font-size:1.8rem;cursor:pointer}
+@media(max-width:780px){
+  .burger{display:block}
+  .links{position:absolute;top:70px;left:0;right:0;flex-direction:column;background:rgba(18,4,31,.96);padding:12px 4%;
+    max-height:0;overflow:hidden;opacity:0;transition:all .4s var(--ease);padding-top:0;padding-bottom:0}
+  .links.open{max-height:400px;opacity:1;padding:12px 4%}
+}
+
+/* =====================================================
+   3. HOME
+   ===================================================== */
+.hero{text-align:center}
+.hero h1{font-size:clamp(1.8rem,7vw,4rem);line-height:1.15;margin-bottom:18px;transition:font-size .6s var(--ease)}
+.launch-label{color:var(--muted);letter-spacing:.3em;text-transform:uppercase;font-size:.85rem;margin-bottom:22px}
+/* After launch: timer, label and date disappear, the title grows to fill the space */
+.hero.launched .pre-launch{display:none}
+.hero.launched h1{font-size:clamp(2.2rem,9vw,6rem);margin:50px 0 80px}
+.tagline{color:var(--muted);letter-spacing:.3em;text-transform:uppercase;font-size:.8rem;margin-bottom:40px}
+
+/* Countdown */
+.countdown{display:flex;justify-content:center;gap:clamp(8px,2.5vw,22px);margin-bottom:10px}
+.time-box{min-width:clamp(64px,19vw,130px);padding:20px 8px}
+.time-box b{display:block;font-size:clamp(1.8rem,7vw,3.6rem);font-weight:800;color:#fff;
+  text-shadow:0 0 18px var(--pink),0 0 40px var(--violet)}
+.time-box span{font-size:.7rem;letter-spacing:.2em;color:var(--muted);text-transform:uppercase}
+.cd-note{color:var(--muted);font-size:.85rem;margin-bottom:46px}
+
+/* Info blocks grid */
+.stack{display:grid;gap:22px;max-width:760px;margin:0 auto}
+.status-row{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.status{display:flex;align-items:center;gap:12px;font-weight:700;font-size:1.2rem}
+.dot{width:14px;height:14px;border-radius:50%;background:#777}
+.dot.on{background:#3dffa0;box-shadow:0 0 14px #3dffa0;animation:pulse 1.8s infinite}
+.dot.off{background:#ff4d6d;box-shadow:0 0 12px #ff4d6d}
+@keyframes pulse{50%{box-shadow:0 0 26px #3dffa0;transform:scale(1.2)}}
+.players{font-size:1.1rem;color:var(--muted)}.players b{color:#fff;font-size:1.4rem}
+.label{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.ip-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.seg{display:inline-flex;padding:4px;border-radius:999px;background:rgba(0,0,0,.3);border:1px solid var(--border)}
+.seg button{border:0;cursor:pointer;font:600 .8rem 'Poppins',sans-serif;color:var(--muted);background:none;padding:7px 16px;border-radius:999px;transition:all .3s var(--ease)}
+.seg button:hover{color:#fff}
+.seg button.on{color:#fff;background:linear-gradient(90deg,var(--pink),var(--violet));box-shadow:0 0 14px rgba(255,61,172,.5)}
+.ip.empty{color:var(--muted);font-weight:500;font-family:'Poppins',sans-serif;font-size:1rem}
+.ip-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.ip{font:600 1.15rem/1 ui-monospace,Consolas,monospace;color:#fff;word-break:break-all;
+  background:rgba(0,0,0,.3);padding:14px 18px;border-radius:14px;border:1px dashed var(--border);flex:1;min-width:200px}
+.btn.copied{background:linear-gradient(90deg,#2bd98a,#3dffd0);box-shadow:0 0 28px rgba(61,255,160,.7);animation:pop .5s var(--ease)}
+@keyframes pop{40%{transform:scale(1.12)}}
+.tech{text-align:center;font-size:1.1rem}.tech b{color:#fff;text-shadow:0 0 12px var(--violet)}
+.beta{
+  text-align:center;font-weight:700;font-size:clamp(1rem,3vw,1.25rem);
+  border-radius:22px;padding:22px;color:#fff;
+  background:linear-gradient(120deg,rgba(255,138,92,.35),rgba(255,61,172,.35),rgba(143,75,255,.35));
+  border:1px solid rgba(255,138,92,.6);box-shadow:0 0 30px rgba(255,61,172,.3);
+}
+
+/* =====================================================
+   4. MODS
+   ===================================================== */
+.cat-title{font-size:1.5rem;margin:40px 0 20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+.mod{display:flex;flex-direction:column;gap:12px}
+.mod h3{font-size:1.15rem}
+.mod p{color:var(--muted);font-size:.9rem;flex:1}
+.mod .file{font-size:.75rem;color:var(--muted);background:rgba(0,0,0,.3);border:1px dashed var(--border);border-radius:10px;padding:6px 10px;word-break:break-all}
+.mod .btn{align-self:flex-start;padding:10px 20px;font-size:.85rem}
+
+/* =====================================================
+   5. GOVERNMENT / PLAYERS
+   ===================================================== */
+.skin{width:110px;height:110px;border-radius:20px;object-fit:cover;background:rgba(0,0,0,.25);
+  border:2px solid var(--border);display:grid;place-items:center;font-size:2.4rem;font-weight:800}
+.president{display:flex;align-items:center;gap:28px;max-width:760px;margin:0 auto 40px;padding:34px;
+  border-color:rgba(255,200,87,.7);box-shadow:0 0 40px rgba(255,138,92,.3)}
+.president .skin{width:160px;height:160px;border-color:#ffc857}
+.badge{display:inline-block;font-size:.72rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;
+  padding:6px 14px;border-radius:999px;color:#1b0630;background:linear-gradient(90deg,#ffc857,var(--orange));margin-bottom:10px}
+.president h2{font-size:clamp(1.8rem,5vw,2.6rem)}
+.players-row{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:700px){.players-row{grid-template-columns:1fr}}
+.skin canvas{height:100%;width:auto;max-width:100%;image-rendering:pixelated;image-rendering:crisp-edges;filter:drop-shadow(0 0 10px rgba(255,61,172,.5))}
+.skin:has(canvas){padding:10px}
+.player{text-align:center;display:flex;flex-direction:column;align-items:center;gap:12px}
+.player p{color:var(--muted);font-size:.85rem}
+@media(max-width:600px){.president{flex-direction:column;text-align:center}}
+
+/* =====================================================
+   6. MAP, CITY PAGES & LIGHTBOX
+   ===================================================== */
+.map-box{height:min(60vh,460px);border-radius:22px;overflow:hidden;border:1px solid var(--border);
+  display:grid;place-items:center;text-align:center;color:var(--muted);margin-bottom:50px;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.03) 0 14px,rgba(255,255,255,.07) 14px 28px)}
+.map-box iframe{width:100%;height:100%;border:0}
+.carousel{position:relative;border-radius:22px;overflow:hidden;border:1px solid var(--border);box-shadow:0 0 40px rgba(143,75,255,.3)}
+.track{display:flex;transition:transform .8s var(--ease)}
+.slide{min-width:100%;aspect-ratio:16/9;display:grid;place-items:center;position:relative}
+.slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.slide span{position:relative;font-weight:700;font-size:clamp(1rem,3vw,1.6rem);text-shadow:0 0 16px #000;
+  background:rgba(0,0,0,.35);padding:10px 22px;border-radius:999px}
+.arrow{position:absolute;top:50%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;border:0;cursor:pointer;
+  color:#fff;font-size:1.4rem;background:rgba(18,4,31,.6);backdrop-filter:blur(8px);transition:all .3s}
+.arrow:hover{background:var(--pink);box-shadow:0 0 20px var(--pink)}
+.prev{left:14px}.next{right:14px}
+.dots{position:absolute;bottom:14px;left:0;right:0;display:flex;justify-content:center;gap:8px}
+.dots i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.4);cursor:pointer;transition:all .3s}
+.dots i.on{background:#fff;width:28px;border-radius:6px;box-shadow:0 0 10px var(--pink)}
+
+.map-box{position:relative;cursor:default;transition:transform .4s var(--ease),box-shadow .4s var(--ease),border-color .4s}
+.map-box[data-full]{cursor:zoom-in}
+.map-box[data-full]:hover{transform:translateY(-5px);border-color:rgba(255,61,172,.6);box-shadow:0 14px 40px rgba(255,61,172,.25)}
+.map-box img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.map-label,.slide-title{position:relative;font:700 clamp(1rem,3vw,1.5rem) 'Poppins',sans-serif;color:#fff;cursor:pointer;
+  text-shadow:0 0 16px #000;background:rgba(18,4,31,.55);backdrop-filter:blur(8px);border:1px solid var(--border);
+  padding:10px 24px;border-radius:999px;transition:all .3s var(--ease)}
+.map-label{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);white-space:nowrap}
+.map-box[data-full]:hover .map-label,.slide-title:hover{background:linear-gradient(90deg,var(--pink),var(--violet));box-shadow:0 0 24px rgba(255,61,172,.7)}
+.slide-title:hover{transform:scale(1.06)}
+.pack{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:10px}
+.pack p{color:var(--muted);font-size:.9rem}
+/* city page */
+.back{display:inline-block;color:var(--muted);text-decoration:none;margin-bottom:18px;transition:color .3s,transform .3s}
+.back:hover{color:#fff;transform:translateX(-4px)}
+.shot{margin:0;aspect-ratio:16/10;border-radius:18px;overflow:hidden;border:1px solid var(--border);display:grid;place-items:center;
+  background:repeating-linear-gradient(45deg,rgba(255,255,255,.03) 0 14px,rgba(255,255,255,.07) 14px 28px);transition:all .4s var(--ease)}
+.shot img{width:100%;height:100%;object-fit:cover}
+figure.shot{cursor:zoom-in}
+figure.shot:hover{transform:scale(1.03);border-color:rgba(255,61,172,.7);box-shadow:0 10px 30px rgba(255,61,172,.3)}
+.shot.empty span{font-size:2.4rem;opacity:.5}
+.big-shot .shot{aspect-ratio:16/9}
+.districts{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:22px}
+.dname{font-size:1rem;margin-top:10px;text-align:center}
+/* lightbox */
+.lightbox{position:fixed;inset:0;z-index:100;background:rgba(10,2,18,.92);backdrop-filter:blur(6px);display:grid;place-items:center;
+  opacity:0;pointer-events:none;transition:opacity .35s var(--ease)}
+.lightbox.open{opacity:1;pointer-events:auto}
+.lightbox img{max-width:94vw;max-height:88vh;border-radius:14px;box-shadow:0 0 60px rgba(255,61,172,.35);transform:scale(.94);transition:transform .35s var(--ease)}
+.lightbox.open img{transform:none}
+.lb-close{position:absolute;top:18px;right:20px;width:48px;height:48px;border-radius:50%;border:0;cursor:pointer;color:#fff;font-size:1.3rem;
+  background:rgba(255,255,255,.12);transition:all .3s}
+.lb-close:hover{background:var(--pink);box-shadow:0 0 20px var(--pink);transform:rotate(90deg)}
+
+/* =====================================================
+   7. RULES (placeholder)
+   ===================================================== */
+.wip{max-width:640px;margin:0 auto;text-align:center;padding:60px 30px}
+.wip .ico{font-size:4rem;margin-bottom:16px;animation:float 3s ease-in-out infinite}
+@keyframes float{50%{transform:translateY(-12px)}}
+.wip h2{font-size:1.8rem;margin-bottom:10px}.wip p{color:var(--muted)}
+
+footer{text-align:center;color:var(--muted);font-size:.8rem;padding:30px 0 40px}
+</style>
+</head>
+<body>
+
+<!-- ============ NAVIGATION ============ -->
+<nav>
+  <div class="wrap">
+    <a href="#home" class="logo">ŁĘŦÆVŞK ŘËPŮBĿÏÇ 6</a>
+    <button class="burger" id="burger" aria-label="Menu">☰</button>
+    <ul class="links" id="links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#mods">Mods</a></li>
+      <li><a href="#government">Government</a></li>
+      <li><a href="#map">Map</a></li>
+      <li><a href="#rules">Laws</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ============ HOME ============ -->
+<section class="page" id="home">
+  <div class="wrap hero" id="hero">
+    <h1 class="glow">ŁĘŦÆVŞK ŘËPŮBĿÏÇ 6</h1>
+
+    <!-- 1. Countdown (hidden automatically after launch) -->
+    <div class="pre-launch">
+    <p class="launch-label">Launches in:</p>
+    <div class="countdown" id="countdown">
+      <div class="card time-box"><b id="cd-d">00</b><span>Days</span></div>
+      <div class="card time-box"><b id="cd-h">00</b><span>Hours</span></div>
+      <div class="card time-box"><b id="cd-m">00</b><span>Minutes</span></div>
+      <div class="card time-box"><b id="cd-s">00</b><span>Seconds</span></div>
+    </div>
+    <p class="cd-note" id="cd-note">November 24, 18:00 (Kyiv time, UTC+2)</p>
+    </div>
+
+    <div class="stack">
+      <!-- 2. Server status -->
+      <div class="card status-row">
+        <div class="status"><span class="dot" id="dot"></span><span id="status-text">Checking…</span></div>
+        <div class="players">Players online: <b id="players">–</b></div>
+      </div>
+
+      <!-- 3. Connection -->
+      <div class="card">
+        <div class="ip-head">
+          <div class="label" style="margin:0">Server IP</div>
+          <div class="seg" id="ip-switch">
+            <button class="on" data-mode="standard">Standard</button>
+            <button data-mode="dynamic">Dynamic</button>
+          </div>
+        </div>
+        <div class="ip-row">
+          <div class="ip" id="ip"></div>
+          <button class="btn" id="copy-btn"><span id="copy-label">Copy IP</span></button>
+        </div>
+      </div>
+
+      <!-- 4. Tech data -->
+      <div class="card tech">Version &amp; core: <b>NeoForge 1.21.1</b></div>
+
+      <!-- 5. Info banner -->
+      <div class="beta">Beta version of the server. Official release — 2027</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MODS ============ -->
+<section class="page" id="mods">
+  <div class="wrap">
+    <h1 class="page-title glow">Mods</h1>
+    <p class="page-sub">Everything you need to join the Republic · NeoForge 1.21.1</p>
+    <div class="card pack"><div><h3>All mods in one file</h3><p>Download the full pack and drop it into your <b>mods</b> folder.</p></div>
+      <a class="btn" id="pack-btn" download>Download all mods</a></div>
+    <h2 class="cat-title glow">Required Mods</h2>
+    <div class="grid" id="mods-required"></div>
+    <h2 class="cat-title glow">Client Mods <small style="font-size:.9rem;font-weight:500;-webkit-text-stroke:0;text-shadow:none;color:var(--muted)">(optimization &amp; comfort)</small></h2>
+    <div class="grid" id="mods-client"></div>
+  </div>
+</section>
+
+<!-- ============ GOVERNMENT ============ -->
+<section class="page" id="government">
+  <div class="wrap">
+    <h1 class="page-title glow">Government &amp; Citizens</h1>
+    <p class="page-sub">The people who shape the Republic</p>
+    <div id="president"></div>
+    <div class="players-row" id="players-grid"></div>
+  </div>
+</section>
+
+<!-- ============ MAP ============ -->
+<section class="page" id="map">
+  <div class="wrap">
+    <h1 class="page-title glow">Map</h1>
+    <p class="page-sub">Explore the world of the Republic</p>
+    <div class="map-box" id="map-box"></div>
+    <div class="carousel" id="carousel">
+      <div class="track" id="track"></div>
+      <button class="arrow prev" id="prev" aria-label="Previous">‹</button>
+      <button class="arrow next" id="next" aria-label="Next">›</button>
+      <div class="dots" id="dots"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PLACE PAGE (rendered by script) ============ -->
+<section class="page" id="place"></section>
+
+<!-- ============ LIGHTBOX ============ -->
+<div class="lightbox" id="lightbox"><button class="lb-close" aria-label="Close">✕</button><img alt=""></div>
+
+<!-- ============ RULES ============ -->
+<section class="page" id="rules">
+  <div class="wrap">
+    <h1 class="page-title glow">Laws</h1>
+    <div class="card wip">
+      <h2 class="glow">Under Development</h2>
+      <p>This section is currently under development.</p>
+    </div>
+  </div>
+</section>
+
+<footer>© ŁĘŦÆVŞK ŘËPŮBĿÏÇ 6 · Private community server</footer>
+
+<script>
+/* =====================================================
+   CONFIG — EDIT EVERYTHING HERE
+   ===================================================== */
+/* =====================================================
+   EMBEDDED SKINS (64x64 PNG as data URI). To change a skin, paste a new
+   data URI here, or set `img: "file.png"` on the player in CONFIG to use a plain picture.
+   Priority per player: skin (embedded) > img > Ely.by API by nickname.
+   ===================================================== */
+const SKINS = {
+  kuralt: "data:image/png;base64,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",
+  vadimka2973: "data:image/png;base64,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",
+  engineer2280: "data:image/png;base64,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",
+  misha12201: "data:image/png;base64,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",
+};
+
+// 12 photo slots. Rename the districts here: districts(["Downtown", "Harbor", ...])
+const districts = names => Array.from({length:12}, (_, i) => ({ name: (names && names[i]) || `District ${i+1}`, img: "" }));
+
+// Modrinth search link for NeoForge 1.21.1. Replace `mr("Name")` with a direct URL (Modrinth / CurseForge) to link to the exact page.
+const mr = q => `https://modrinth.com/mods?q=${encodeURIComponent(q)}&v=1.21.1&g=categories%3Aneoforge`;
+
+const CONFIG = {
+  // Launch date with explicit Kyiv offset (+02:00 = EET). Change the date here if needed.
+  launchDate: "2026-11-24T18:00:00+02:00",
+
+  // Standard (permanent) server address, with port. Also used for the status check.
+  serverIP: "LNR6.aternos.me:31917",
+
+  // Dynamic address: Aternos gives a new one every time the server starts.
+  // Paste the current one here (e.g. "abc-1234.aternos.me:12345"); leave "" if there is none.
+  dynamicIP: "",
+
+  // Status is fetched from the public mcsrvstat.us API using serverIP
+  statusRefreshSec: 60,
+
+  // "auto" = detect via public APIs; "online" / "offline" = set the status by hand
+  statusMode: "auto",
+  manualPlayers: 0,          // players shown when statusMode is "online"
+
+
+  // Ely.by skin renderer (nickname is appended automatically)
+  skinAPI: "https://ely.by/services/skins-renderer/v1/target?name=",
+
+  // File for the "Download all mods" button (path to your archive, or a direct link)
+  modsPackUrl: "mods-pack.zip",
+
+  // Mods — change `url` to any Modrinth / CurseForge link
+  modsRequired: [
+    { name: "Create", file: "create-1.21.1-6.0.10", desc: "Gears, belts and kinetic machines: the core technology mod of the server.", url: mr("Create") },
+    { name: "Create Aeronautics", file: "create-aeronautics-bundled-1.21.1-1.3.2", desc: "Adds flying contraptions and airships to Create.", url: mr("Create Aeronautics") },
+    { name: "Chipped", file: "chipped-neoforge-1.21.1-4.0.2", desc: "Hundreds of decorative block variants for building.", url: mr("Chipped") },
+    { name: "FramedBlocks", file: "FramedBlocks-10.6.3", desc: "Framed blocks that copy the look of any other block.", url: mr("FramedBlocks") },
+    { name: "Macaw's Bridges", file: "mcw-bridges-3.1.2-mc1.21.1neoforge", desc: "Bridges and walkways in many styles and materials.", url: mr("Macaw's Bridges") },
+    { name: "Macaw's Fences", file: "mcw-mcwfences-1.2.1-mc1.21.1neoforge", desc: "Fences, gates and walls for every build style.", url: mr("Macaw's Fences and Walls") },
+    { name: "Macaw's Roofs", file: "mcw-roofs-2.3.2-mc1.21.1neoforge", desc: "Roof blocks: slopes, ridges, gutters and more.", url: mr("Macaw's Roofs") },
+    { name: "Macaw's Doors", file: "mcw-doors-1.1.5-mc1.21.1neoforge", desc: "A wide set of decorative doors and trapdoors.", url: mr("Macaw's Doors") },
+    { name: "Macaw's Stairs", file: "mcw-mcwstairs-1.0.2-mc1.21.1neoforge", desc: "Extra stair shapes and variants for builders.", url: mr("Macaw's Stairs") },
+    { name: "Macaw's Holidays", file: "mcw-holidays-1.1.2-mc1.21.1neoforge", desc: "Seasonal and festive decorations.", url: mr("Macaw's Holidays") },
+    { name: "Macaw's Windows", file: "mcw-mcwwindows-2.4.2-mc1.21.1neoforge", desc: "Windows, curtains, blinds and shutters.", url: mr("Macaw's Windows") },
+    { name: "Macaw's Lights", file: "mcw-lights-1.1.5-mc1.21.1neoforge", desc: "Lamps, lanterns and decorative lighting.", url: mr("Macaw's Lights and Lamps") },
+    { name: "Macaw's Paintings", file: "mcw-paintings-1.1.0-mc1.21.1neoforge", desc: "Extra paintings to decorate walls.", url: mr("Macaw's Paintings") },
+    { name: "Paladin's Furniture", file: "paladin-furniture-mod-1.5.0-neoforge-mc1.21.1", desc: "Tables, chairs, sofas and other furniture.", url: mr("Paladin's Furniture") },
+    { name: "Athena", file: "athena-neoforge-1.21.1-4.0.6", desc: "Library for connected textures used by other mods.", url: mr("Athena") },
+    { name: "Cloth Config API", file: "cloth-config-15.0.140-neoforge", desc: "Configuration library required by other mods.", url: mr("Cloth Config API") },
+    { name: "DragonLib", file: "dragonlib-3.0.29+mc1.21.1-neoforge", desc: "Library mod required by other mods.", url: mr("DragonLib") },
+    { name: "Resourceful Lib", file: "resourcefullib-neoforge-1.21-3.0.12", desc: "Library mod required by other mods.", url: mr("Resourceful Lib") },
+    { name: "Sable", file: "sable-neoforge-1.21.1-2.0.6", desc: "Library mod required by content mods on the server.", url: mr("Sable") },
+  ],
+  modsClient: [
+    { name: "Distant Horizons", file: "DistantHorizons-2.2.3-1.21.1-fabric-neoforge", desc: "Far render distance: see distant terrain without a performance hit.", url: mr("Distant Horizons") },
+    { name: "FerriteCore", file: "ferritecore-7.0.3-neoforge", desc: "Reduces memory usage.", url: mr("FerriteCore") },
+    { name: "ImmediatelyFast", file: "ImmediatelyFast-NeoForge-1.6.15+1.21.1", desc: "Speeds up rendering and the interface.", url: mr("ImmediatelyFast") },
+    { name: "Entity Culling", file: "entityculling-neoforge-1.11.3-mc1.21.1", desc: "Raises FPS by skipping creatures you cannot see.", url: mr("Entity Culling") },
+    { name: "Krypton", file: "krypton_fnp-neoforge-1.21.1-0.2.28.1-1.21.1", desc: "Optimizes the network stack.", url: mr("Krypton") },
+    { name: "ModernFix", file: "modernfix-neoforge-5.27.27+mc1.21.1", desc: "Faster loading and general optimization.", url: mr("ModernFix") },
+    { name: "Xaero's Minimap", file: "xaerominimap-neoforge-1.21.1-24.6.0", desc: "Minimap for navigation.", url: mr("Xaero's Minimap") },
+    { name: "Xaero's WorldMap", file: "xaeroworldmap-neoforge-1.21.1-1.38.0", desc: "Full world map.", url: mr("Xaero's World Map") },
+    { name: "WorldEdit", file: "worldedit-mod-7.3.8", desc: "Building and editing tools.", url: mr("WorldEdit") },
+    { name: "WorldEditCUI", file: "WorldEditCUI-NeoForge-1.21.1+01-SNAPSHOT", desc: "Shows WorldEdit selections in the world.", url: mr("WorldEditCUI") },
+  ],
+
+  // President. Use `img: "path/to/file.png"` to override the Ely.by skin with a local picture.
+  president: { nick: "Kuralt", title: "President", img: "", skin: "kuralt", skinPage: "https://ely.by/skins/s5092802" },
+
+  // Citizens
+  players: [
+    { nick: "Engineer2280", role: "Citizen", img: "", skin: "engineer2280", skinPage: "https://ely.by/skins/s2900489" },
+    { nick: "MiSHA12201",   role: "Citizen", img: "", skin: "misha12201" },
+    { nick: "vadimka2973",  role: "Citizen", img: "", skin: "vadimka2973", skinPage: "https://ely.by/skins/s3973761" },
+  ],
+
+  // Server map picture shown on the Map page (click opens it full-screen)
+  serverMap: "",
+
+  // Places: the four cities. Each has a title, description,
+  // a map picture (Xaero's map screenshot) and 12 named photo slots.
+  // Set `map` / `img` to an image file or URL; empty ones show a placeholder.
+  places: {
+    kuralt:       { title: "Kuralt's city",       desc: "Welcome to Kuralt's city.",         map: "", photos: districts() },
+    vadimka2973:  { title: "vadimka2973's city",  desc: "Welcome to vadimka2973's city.",    map: "", photos: districts() },
+    engineer2280: { title: "Engineer2280's city", desc: "Welcome to Engineer2280's city.",   map: "", photos: districts() },
+    misha12201:   { title: "MiSHA12201's city",   desc: "Welcome to MiSHA12201's city.",     map: "", photos: districts() },
+  },
+
+  // Carousel on the Map page: `place` is a key from `places`, `img` is an optional cover picture
+  slides: [
+    { place: "kuralt",       img: "" },
+    { place: "vadimka2973",  img: "" },
+    { place: "engineer2280", img: "" },
+    { place: "misha12201",   img: "" },
+  ],
+  slideAutoplayMs: 5000,
+};
+
+/* =====================================================
+   ROUTER (hash-based pages)
+   ===================================================== */
+const pages = [...document.querySelectorAll('.page')];
+const navLinks = [...document.querySelectorAll('.links a')];
+function show(id){
+  let target = pages.some(p => p.id === id) ? id : 'home';
+  if (id.startsWith('place-') && CONFIG.places[id.slice(6)]) { renderPlace(id.slice(6)); target = 'place'; }
+  else if (target === 'place') target = 'map';
+  pages.forEach(p => p.classList.toggle('active', p.id === target));
+  const navTarget = target === 'place' ? 'map' : target;   // city pages keep "Map" highlighted
+  navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === '#' + navTarget));
+  document.getElementById('links').classList.remove('open');
+  window.scrollTo({top:0});
+}
+function navTo(id){ show(id); try { history.replaceState(null, '', '#' + id); } catch(err) {} }
+// One click handler for: city/map links, normal page links, and photos (lightbox)
+document.addEventListener('click', e => {
+  const full = e.target.closest('[data-full]');
+  if (full) { openLB(full.dataset.full, full.dataset.alt); return; }
+  const pl = e.target.closest('[data-place]');
+  if (pl) { e.preventDefault(); navTo('place-' + pl.dataset.place); return; }
+  const a = e.target.closest('a[href^="#"]');
+  if (a) { e.preventDefault(); navTo(a.getAttribute('href').slice(1)); }
+});
+window.addEventListener('hashchange', () => show(location.hash.slice(1)));
+document.getElementById('burger').onclick = () => document.getElementById('links').classList.toggle('open');
+show(location.hash.slice(1) || 'home');
+
+/* =====================================================
+   COUNTDOWN
+   ===================================================== */
+const launch = new Date(CONFIG.launchDate).getTime();
+const pad = n => String(n).padStart(2,'0');
+const cdD=document.getElementById('cd-d'),cdH=document.getElementById('cd-h'),cdM=document.getElementById('cd-m'),cdS=document.getElementById('cd-s');
+function tick(){
+  let diff = Math.max(0, launch - Date.now());
+  const d = Math.floor(diff/864e5); diff %= 864e5;
+  const h = Math.floor(diff/36e5);  diff %= 36e5;
+  const m = Math.floor(diff/6e4);   const s = Math.floor(diff%6e4/1e3);
+  cdD.textContent = pad(d); cdH.textContent = pad(h); cdM.textContent = pad(m); cdS.textContent = pad(s);
+  document.getElementById('hero').classList.toggle('launched', launch <= Date.now());
+}
+tick(); setInterval(tick, 1000);
+
+/* =====================================================
+   SERVER STATUS
+   ===================================================== */
+/* =====================================================
+   IP SWITCH (standard / dynamic)
+   ===================================================== */
+const ipBox = document.getElementById('ip');
+let ipMode = 'standard';
+const currentIP = () => ipMode === 'dynamic' ? CONFIG.dynamicIP : CONFIG.serverIP;
+function renderIP(){
+  const ip = currentIP();
+  ipBox.textContent = ip || 'Dynamic IP is not available right now';
+  ipBox.classList.toggle('empty', !ip);
+  document.getElementById('copy-btn').disabled = !ip;
+  document.querySelectorAll('#ip-switch button').forEach(b => b.classList.toggle('on', b.dataset.mode === ipMode));
+}
+document.getElementById('ip-switch').addEventListener('click', e => {
+  if (e.target.dataset.mode) { ipMode = e.target.dataset.mode; renderIP(); }
+});
+renderIP();
+// Two independent status APIs are queried; the server counts as online if either confirms it.
+// Aternos answers pings even when the server is off/starting, so those placeholder replies are treated as offline.
+const NOT_READY = /offline|starting|loading|queue|saving|preparing|stopping/i;
+const STATUS_SOURCES = [
+  async ip => {
+    const j = await (await fetch('https://api.mcstatus.io/v2/status/java/' + ip)).json();
+    const text = ((j.version && j.version.name_clean) || '') + ' ' + ((j.motd && j.motd.clean) || '');
+    return { raw: j, online: !!j.online && !NOT_READY.test(text), players: j.players ? j.players.online : 0 };
+  },
+  async ip => {
+    const j = await (await fetch('https://api.mcsrvstat.us/3/' + ip)).json();
+    const text = (typeof j.version === 'string' ? j.version : '') + ' ' + ((j.motd && j.motd.clean) ? j.motd.clean.join(' ') : '');
+    return { raw: j, online: !!j.online && !NOT_READY.test(text), players: j.players ? j.players.online : 0 };
+  },
+];
+async function updateStatus(){
+  if (CONFIG.statusMode !== 'auto'){
+    const on = CONFIG.statusMode === 'online';
+    document.getElementById('dot').className = 'dot ' + (on ? 'on' : 'off');
+    document.getElementById('status-text').textContent = on ? 'Server is online' : 'Server is offline';
+    document.getElementById('players').textContent = on ? CONFIG.manualPlayers : 0;
+    return;
+  }
+  const dot = document.getElementById('dot'), txt = document.getElementById('status-text'), pl = document.getElementById('players');
+  const res = await Promise.allSettled(STATUS_SOURCES.map(f => f(CONFIG.serverIP)));
+  // Debug: open DevTools (F12) → Console and copy the "[status]" line
+  console.log('[status] ' + JSON.stringify(res.map(r => r.status !== 'fulfilled' ? { error: String(r.reason) } : {
+    online: r.value.raw.online, usedAsOnline: r.value.online, players: r.value.raw.players,
+    version: r.value.raw.version, motd: r.value.raw.motd, host: r.value.raw.hostname || r.value.raw.host,
+    port: r.value.raw.port, ip: r.value.raw.ip_address || r.value.raw.ip, debug: r.value.raw.debug })));
+  const ok = res.filter(r => r.status === 'fulfilled').map(r => r.value);
+  const live = ok.find(r => r.online);
+  if (live){
+    dot.className = 'dot on'; txt.textContent = 'Server is online';
+    pl.textContent = Math.max(...ok.filter(r => r.online).map(r => r.players));
+  } else if (ok.length){
+    dot.className = 'dot off'; txt.textContent = 'Server is offline'; pl.textContent = '0';
+  } else {
+    dot.className = 'dot'; txt.textContent = 'Status unavailable'; pl.textContent = '–';
+  }
+}
+updateStatus(); setInterval(updateStatus, CONFIG.statusRefreshSec * 1000);
+
+/* =====================================================
+   COPY IP BUTTON
+   ===================================================== */
+const copyBtn = document.getElementById('copy-btn'), copyLabel = document.getElementById('copy-label');
+copyBtn.onclick = async () => {
+  try { await navigator.clipboard.writeText(currentIP()); }
+  catch(e){ // fallback for older browsers / non-secure contexts
+    const t = document.createElement('textarea'); t.value = currentIP();
+    document.body.appendChild(t); t.select(); document.execCommand('copy'); t.remove();
+  }
+  copyBtn.classList.add('copied'); copyLabel.textContent = 'Copied!';
+  setTimeout(() => { copyBtn.classList.remove('copied'); copyLabel.textContent = 'Copy IP'; }, 2000);
+};
+
+/* =====================================================
+   MODS
+   ===================================================== */
+const modCard = m => `<div class="card mod"><h3>${m.name}</h3><p>${m.desc}</p>${m.file ? `<code class="file">${m.file}.jar</code>` : ''}
+  <a class="btn" href="${m.url}" target="_blank" rel="noopener">Download</a></div>`;
+document.getElementById('mods-required').innerHTML = CONFIG.modsRequired.map(modCard).join('');
+document.getElementById('mods-client').innerHTML = CONFIG.modsClient.map(modCard).join('');
+
+document.getElementById('pack-btn').href = CONFIG.modsPackUrl;
+
+/* =====================================================
+   PLAYERS (Ely.by skins, local image override, letter fallback)
+   ===================================================== */
+function skinHTML(p){
+  if (p.skin && SKINS[p.skin]) {
+    const cv = `<div class="skin"><canvas width="16" height="20" data-skin="${p.skin}" aria-label="${p.nick}"></canvas></div>`;
+    return p.skinPage ? `<a href="${p.skinPage}" target="_blank" rel="noopener" title="Open skin on Ely.by">${cv}</a>` : cv;
+  }
+  const src = p.img || CONFIG.skinAPI + encodeURIComponent(p.nick);
+  // If the image fails to load, show the first letter instead
+  const tag = `<img class="skin" src="${src}" alt="${p.nick}" loading="lazy"
+    onerror="this.outerHTML='<div class=\\'skin\\'>${p.nick[0]}</div>'">`;
+  return p.skinPage ? `<a href="${p.skinPage}" target="_blank" rel="noopener" title="Open skin on Ely.by">${tag}</a>` : tag;
+}
+const pr = CONFIG.president;
+document.getElementById('president').innerHTML = `<div class="card president">${skinHTML(pr)}
+  <div><span class="badge">${pr.title}</span><h2 class="glow">${pr.nick}</h2><p style="color:var(--muted)">Current head of state</p></div></div>`;
+document.getElementById('players-grid').innerHTML = CONFIG.players.map(p =>
+  `<div class="card player">${skinHTML(p)}<h3>${p.nick}</h3><p>${p.role}</p></div>`).join('');
+
+/* =====================================================
+   MAP
+   ===================================================== */
+const mapBox = document.getElementById('map-box');
+if (CONFIG.serverMap) { mapBox.dataset.full = CONFIG.serverMap; mapBox.dataset.alt = 'Server map'; }
+mapBox.innerHTML =
+  (CONFIG.serverMap ? `<img src="${CONFIG.serverMap}" alt="Server map">` : `<div style="font-size:3.5rem">🗺️</div>`) +
+  `<span class="map-label">Server Map</span>`;
+
+/* =====================================================
+   PLACE PAGE (city pages): title, description, map picture, 12 district photos
+   ===================================================== */
+function renderPlace(key){
+  const p = CONFIG.places[key];
+  const shot = (src, label, icon) => src
+    ? `<figure class="shot" data-full="${src}" data-alt="${label}"><img src="${src}" alt="${label}" loading="lazy"></figure>`
+    : `<div class="shot empty"><span>${icon}</span></div>`;
+  document.getElementById('place').innerHTML = `<div class="wrap">
+    <a href="#map" class="back">← Back to Map</a>
+    <h1 class="page-title glow">${p.title}</h1>
+    <p class="page-sub">${p.desc}</p>
+    <div class="big-shot">${shot(p.map, p.title + ' map', '🗺️')}</div>
+    <h2 class="cat-title glow">Districts</h2>
+    <div class="districts">${p.photos.map(ph =>
+      `<div>${shot(ph.img, ph.name, '📷')}<h3 class="dname">${ph.name}</h3></div>`).join('')}</div>
+  </div>`;
+}
+
+/* =====================================================
+   LIGHTBOX (full-size photo, closes with the cross, backdrop click or Esc)
+   ===================================================== */
+const lb = document.getElementById('lightbox'), lbImg = lb.querySelector('img');
+function openLB(src, alt){ lbImg.src = src; lbImg.alt = alt || ''; lb.classList.add('open'); document.body.style.overflow = 'hidden'; }
+function closeLB(){ lb.classList.remove('open'); document.body.style.overflow = ''; }
+lb.addEventListener('click', e => { if (e.target !== lbImg) closeLB(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLB(); });
+
+/* =====================================================
+   CAROUSEL (arrows, dots, swipe, autoplay)
+   ===================================================== */
+const gradients = ['#ff3dac,#8f4bff','#ff8a5c,#ff3dac','#8f4bff,#2a0a3d','#ff3dac,#ff8a5c'];
+const track = document.getElementById('track'), dots = document.getElementById('dots');
+track.innerHTML = CONFIG.slides.map((s,i) => `<div class="slide" style="background:linear-gradient(135deg,${gradients[i%4]})">
+  ${s.img ? `<img src="${s.img}" alt="${s.title}" loading="lazy">` : ''}<button class="slide-title" data-place="${s.place}">${CONFIG.places[s.place].title} →</button></div>`).join('');
+dots.innerHTML = CONFIG.slides.map((_,i) => `<i data-i="${i}"></i>`).join('');
+let cur = 0, timer;
+function go(i){
+  cur = (i + CONFIG.slides.length) % CONFIG.slides.length;
+  track.style.transform = `translateX(-${cur*100}%)`;
+  [...dots.children].forEach((d,k) => d.classList.toggle('on', k === cur));
+}
+function auto(){ clearInterval(timer); timer = setInterval(() => go(cur+1), CONFIG.slideAutoplayMs); }
+document.getElementById('prev').onclick = () => { go(cur-1); auto(); };
+document.getElementById('next').onclick = () => { go(cur+1); auto(); };
+dots.onclick = e => { if (e.target.dataset.i) { go(+e.target.dataset.i); auto(); } };
+let x0 = null; // touch swipe
+track.addEventListener('touchstart', e => x0 = e.touches[0].clientX, {passive:true});
+track.addEventListener('touchend', e => { if (x0 === null) return; const dx = e.changedTouches[0].clientX - x0;
+  if (Math.abs(dx) > 40) { go(cur + (dx < 0 ? 1 : -1)); auto(); } x0 = null; });
+go(0); auto();
+
+/* =====================================================
+   SKIN BUST RENDERER: draws head + torso + arms (with 2nd layers) from a 64x64 skin
+   ===================================================== */
+document.querySelectorAll('canvas[data-skin]').forEach(cv => {
+  const img = new Image();
+  img.onload = () => {
+    const c = cv.getContext('2d'); c.imageSmoothingEnabled = false;
+    // detect slim (3px) arms: pixel at x=47 of the arm front is transparent
+    const t = document.createElement('canvas'); t.width = t.height = 64;
+    const tc = t.getContext('2d'); tc.drawImage(img,0,0);
+    const slim = tc.getImageData(47,24,1,1).data[3] === 0;
+    const w = slim ? 3 : 4;
+    const d = (sx,sy,sw,sh,dx,dy) => c.drawImage(img,sx,sy,sw,sh,dx,dy,sw,sh);
+    d(20,20,8,12,4,8);  d(20,36,8,12,4,8);                       // torso + jacket
+    d(44,20,w,12,4-w,8); d(44,36,w,12,4-w,8);                    // right arm (viewer left)
+    d(36,52,w,12,12,8);  d(52,52,w,12,12,8);                     // left arm (viewer right)
+    d(8,8,8,8,4,0);     d(40,8,8,8,4,0);                         // head + hat layer
+  };
+  img.src = SKINS[cv.dataset.skin];
+});
+</script>
+</body>
+</html>
