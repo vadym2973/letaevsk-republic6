@@ -114,12 +114,6 @@ nav .wrap{width:100%;padding:0 clamp(14px,2.5vw,32px);display:flex;align-items:c
 @keyframes pulse{50%{box-shadow:0 0 26px #3dffa0;transform:scale(1.2)}}
 .players{font-size:1.1rem;color:var(--muted)}.players b{color:#fff;font-size:1.4rem}
 .label{font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
-.ip-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-.seg{display:inline-flex;padding:4px;border-radius:999px;background:rgba(0,0,0,.3);border:1px solid var(--border)}
-.seg button{border:0;cursor:pointer;font:600 .8rem 'Poppins',sans-serif;color:var(--muted);background:none;padding:7px 16px;border-radius:999px;transition:all .3s var(--ease)}
-.seg button:hover{color:#fff}
-.seg button.on{color:#fff;background:linear-gradient(90deg,var(--pink),var(--violet));box-shadow:0 0 14px rgba(255,61,172,.5)}
-.ip.empty{color:var(--muted);font-weight:500;font-family:'Poppins',sans-serif;font-size:1rem}
 .ip-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;justify-content:space-between}
 .ip{font:600 1.15rem/1 ui-monospace,Consolas,monospace;color:#fff;word-break:break-all;
   background:rgba(0,0,0,.3);padding:14px 18px;border-radius:14px;border:1px dashed var(--border);flex:1;min-width:200px}
@@ -272,13 +266,7 @@ footer{text-align:center;color:var(--muted);font-size:.8rem;padding:30px 0 40px}
 
       <!-- 3. Connection -->
       <div class="card">
-        <div class="ip-head">
-          <div class="label" style="margin:0">Server IP</div>
-          <div class="seg" id="ip-switch">
-            <button class="on" data-mode="standard">Standard</button>
-            <button data-mode="dynamic">Dynamic</button>
-          </div>
-        </div>
+        <div class="label">Server IP</div>
         <div class="ip-row">
           <div class="ip" id="ip"></div>
           <button class="btn" id="copy-btn"><span id="copy-label">Copy IP</span></button>
@@ -300,7 +288,7 @@ footer{text-align:center;color:var(--muted);font-size:.8rem;padding:30px 0 40px}
     <h1 class="page-title glow">Mods</h1>
     <p class="page-sub">Everything you need to join the Republic · NeoForge 1.21.1</p>
     <div class="card pack"><div><h3>All mods in one file</h3><p>Download the full pack and drop it into your <b>mods</b> folder.</p></div>
-      <a class="btn" id="pack-btn" download>Download all mods</a></div>
+      <a class="btn" id="pack-btn">Download all mods</a></div>
     <h2 class="cat-title glow">Required Mods</h2>
     <div class="grid" id="mods-required"></div>
     <h2 class="cat-title glow">Client Mods <small style="font-size:.9rem;font-weight:500;-webkit-text-stroke:0;text-shadow:none;color:var(--muted)">(optimization &amp; comfort)</small></h2>
@@ -381,9 +369,6 @@ const CONFIG = {
   // Standard (permanent) server address, with port. Also used for the status check.
   serverIP: "LNR6.aternos.me:31917",
 
-  // Dynamic address: Aternos gives a new one every time the server starts.
-  // Paste the current one here (e.g. "abc-1234.aternos.me:12345"); leave "" if there is none.
-  dynamicIP: "",
 
   // Status is fetched from the public mcsrvstat.us API using serverIP
   statusRefreshSec: 60,
@@ -403,6 +388,11 @@ const CONFIG = {
   modsRequired: [
     { name: "Create", file: "create-1.21.1-6.0.10", desc: "Gears, belts and kinetic machines: the core technology mod of the server.", url: mr("Create") },
     { name: "Create Aeronautics", file: "create-aeronautics-bundled-1.21.1-1.3.2", desc: "Adds flying contraptions and airships to Create.", url: mr("Create Aeronautics") },
+    { name: "Mekanism", file: "Mekanism-1.21.1-10.7.19.85", desc: "Technology mod: machines, energy, ore processing and more.", url: mr("Mekanism") },
+    { name: "Mekanism Additions", file: "MekanismAdditions-1.21.1-10.7.19.85", desc: "Extra machines, blocks and items for Mekanism.", url: mr("Mekanism Additions") },
+    { name: "Mekanism Generators", file: "MekanismGenerators-1.21.1-10.7.19.85", desc: "Power generators for Mekanism: solar, wind, heat, fission and fusion.", url: mr("Mekanism Generators") },
+    { name: "Mekanism Tools", file: "MekanismTools-1.21.1-10.7.19.85", desc: "Tools and armor made from Mekanism materials.", url: mr("Mekanism Tools") },
+    { name: "Mekanism Weapons", file: "MekanismWeapons-1.21.1-4.3", desc: "Weapons and combat gear for Mekanism.", url: mr("Mekanism Weapons") },
     { name: "Chipped", file: "chipped-neoforge-1.21.1-4.0.2", desc: "Hundreds of decorative block variants for building.", url: mr("Chipped") },
     { name: "FramedBlocks", file: "FramedBlocks-10.6.3", desc: "Framed blocks that copy the look of any other block.", url: mr("FramedBlocks") },
     { name: "Macaw's Bridges", file: "mcw-bridges-3.1.2-mc1.21.1neoforge", desc: "Bridges and walkways in many styles and materials.", url: mr("Macaw's Bridges") },
@@ -464,6 +454,9 @@ const CONFIG = {
     { place: "engineer2280", img: "" },
     { place: "misha12201",   img: "" },
   ],
+  // Timer tick sound. onlyLastSeconds: 60 = starts at 01:00 and continues until the end; 0 = every second the whole time
+  tickSound: { onlyLastSeconds: 60, frequency: 880, volume: 0.25 },
+
   slideAutoplayMs: 5000,
 };
 
@@ -510,28 +503,41 @@ function tick(){
   cdD.textContent = pad(d); cdH.textContent = pad(h); cdM.textContent = pad(m); cdS.textContent = pad(s);
   document.getElementById('hero').classList.toggle('launched', launch <= Date.now());
 }
-tick(); setInterval(tick, 1000);
+/* Tick sound (generated with Web Audio, no file needed).
+   Browsers only allow sound after the visitor has interacted with the page (click, tap or key),
+   so audio is unlocked silently by the first interaction. Without any interaction the browser keeps it muted. */
+let audioCtx = null, lastSec = null;
+function unlockAudio(){
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+}
+['pointerdown', 'keydown', 'touchstart'].forEach(ev => document.addEventListener(ev, unlockAudio, { passive: true }));
+function playTick(){
+  if (!audioCtx || audioCtx.state !== 'running') return;
+  const o = audioCtx.createOscillator(), g = audioCtx.createGain(), t = audioCtx.currentTime;
+  o.type = 'sine'; o.frequency.value = CONFIG.tickSound.frequency;
+  g.gain.setValueAtTime(CONFIG.tickSound.volume, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+  o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t + 0.13);
+}
+function soundStep(){
+  const left = Math.floor((launch - Date.now()) / 1000);
+  if (left === lastSec) return;
+  lastSec = left;
+  const lim = CONFIG.tickSound.onlyLastSeconds;
+  if (left > 0 && (!lim || left <= lim)) playTick();
+}
+tick(); setInterval(() => { tick(); soundStep(); }, 250);
+
+/* =====================================================
+   SERVER IP
+   ===================================================== */
+const currentIP = () => CONFIG.serverIP;
+document.getElementById('ip').textContent = CONFIG.serverIP;
 
 /* =====================================================
    SERVER STATUS
    ===================================================== */
-/* =====================================================
-   IP SWITCH (standard / dynamic)
-   ===================================================== */
-const ipBox = document.getElementById('ip');
-let ipMode = 'standard';
-const currentIP = () => ipMode === 'dynamic' ? CONFIG.dynamicIP : CONFIG.serverIP;
-function renderIP(){
-  const ip = currentIP();
-  ipBox.textContent = ip || 'Dynamic IP is not available right now';
-  ipBox.classList.toggle('empty', !ip);
-  document.getElementById('copy-btn').disabled = !ip;
-  document.querySelectorAll('#ip-switch button').forEach(b => b.classList.toggle('on', b.dataset.mode === ipMode));
-}
-document.getElementById('ip-switch').addEventListener('click', e => {
-  if (e.target.dataset.mode) { ipMode = e.target.dataset.mode; renderIP(); }
-});
-renderIP();
 // Two independent status APIs are queried; the server counts as online if either confirms it.
 // Aternos answers pings even when the server is off/starting, so those placeholder replies are treated as offline.
 const NOT_READY = /offline|starting|loading|queue|saving|preparing|stopping/i;
@@ -597,7 +603,9 @@ const modCard = m => `<div class="card mod"><h3>${m.name}</h3><p>${m.desc}</p>${
 document.getElementById('mods-required').innerHTML = CONFIG.modsRequired.map(modCard).join('');
 document.getElementById('mods-client').innerHTML = CONFIG.modsClient.map(modCard).join('');
 
-document.getElementById('pack-btn').href = CONFIG.modsPackUrl;
+const packBtn = document.getElementById('pack-btn');
+packBtn.href = CONFIG.modsPackUrl;
+packBtn.setAttribute('download', CONFIG.modsPackUrl.split('/').pop() || 'mods-pack.zip');   // forces a download for files on the same site
 
 /* =====================================================
    PLAYERS (Ely.by skins, local image override, letter fallback)
